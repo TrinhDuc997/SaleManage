@@ -14,7 +14,13 @@ export default class TabDonHang extends Component {
   render() {
     return (
       <Stack.Navigator>
-            <Stack.Screen name="Đơn Hàng" component={View}></Stack.Screen>
+            <Stack.Screen 
+            name="Đơn Hàng"
+            component={View}
+            options={{
+              headerShown:false
+            }}
+            ></Stack.Screen>
         </Stack.Navigator>
     );
   }

@@ -55,11 +55,20 @@ export default class TabSanPhamCpn extends Component {
     super(props);
   }
 
+  funcThemSanPham = () => {
+    const {navigation} = this.props
+    const {setParams} = navigation
+    setParams({
+        ductest:"test"
+    })
+    navigation.navigate("themSanPham")
+  }
   render() {
     return (
         <SafeAreaView style={style.container}>
             <TouchableOpacity
                 style={style.styleTouchable}
+                onPress = { () => {this.funcThemSanPham()}}
             >
                 <Text style={{paddingBottom:15}}>
                     <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006400"} />

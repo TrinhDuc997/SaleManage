@@ -14,7 +14,13 @@ export default class TabThem extends Component {
   render() {
     return (
       <Stack.Navigator>
-            <Stack.Screen name="Thêm" component={View}></Stack.Screen>
+            <Stack.Screen
+             name="Thêm"
+            component={View}
+            options={{
+              headerShown:false
+            }}
+            ></Stack.Screen>
         </Stack.Navigator>
     );
   }

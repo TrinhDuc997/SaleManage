@@ -16,9 +16,13 @@ export default class TabSanPhamCtn extends Component {
     return (
       <Stack.Navigator>
             <Stack.Screen 
-              name="Sản Phẩm"
+              name="sanPham"
               component={TabSanPhamCpn}
-              options={{headerTitleAlign:"center"}}
+              options={{
+                headerTitle:"Sản Phẩm",
+                headerTitleAlign:"center",
+                headerShown:false
+              }}
             />
         </Stack.Navigator>
     );

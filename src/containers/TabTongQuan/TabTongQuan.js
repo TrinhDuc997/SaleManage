@@ -14,7 +14,13 @@ export default class TabTongQuan extends Component {
   render() {
     return (
         <Stack.Navigator>
-            <Stack.Screen name="Tổng Quan" component={View}></Stack.Screen>
+            <Stack.Screen
+             name="Tổng Quan" 
+             component={View}
+             options={{
+              headerShown:false
+            }}
+             ></Stack.Screen>
         </Stack.Navigator>
     );
   }

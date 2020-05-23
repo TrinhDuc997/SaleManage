@@ -14,7 +14,13 @@ export default class TabBaoCao extends Component {
   render() {
     return (
       <Stack.Navigator>
-            <Stack.Screen name="Báo Cáo" component={View}></Stack.Screen>
+            <Stack.Screen 
+              name="Báo Cáo"
+              component={View}
+              options={{
+                headerShown:false
+              }}
+              ></Stack.Screen>
         </Stack.Navigator>
     );
   }
