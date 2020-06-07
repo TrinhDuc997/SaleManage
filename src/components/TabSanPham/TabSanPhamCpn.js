@@ -25,7 +25,10 @@ import {
             item={},
         } = param
         return(
-            <TouchableOpacity style={style.styleTouchableItem}>
+            <TouchableOpacity
+                style={style.styleTouchableItem}
+                onPress= { () => item.handleView(item.key)}
+                >
                 <View style={{width:"20%"}}>
                     <Text style={{textAlign:"center",paddingTop:15}}>
                         <FontAwesomeIcon icon={item.icon} size={35} color="#696969"/>
@@ -43,26 +46,43 @@ import {
             </TouchableOpacity>
         )
     }
-    const data = [
-        {key:"1",title:"Danh Sách Sản Phẩm",icon:faListAlt},
-        {key:"2",title:"Nhập Hàng",icon:faDollyFlatbed},
-        {key:"3",title:"Kiểm Hàng",icon:faCheckSquare},
-    ]
+    
 /* private func-end */
 
 export default class TabSanPhamCpn extends Component {
   constructor(props) {
     super(props);
   }
-
+    
   funcThemSanPham = () => {
     const {navigation} = this.props
     const {setParams} = navigation
-    setParams({
+    setParams({ // props send compoennt themSanPham
         ductest:"test"
     })
     navigation.navigate("themSanPham")
   }
+
+  handleView = (typeView) => {
+    const {navigation} = this.props
+    const {setParams} = navigation
+    switch(typeView){
+        case "1":
+            navigation.navigate("danhSachSanPham")
+            break;
+        case "2":
+            navigation.navigate("donNhapHang")
+            break;
+        case "3":
+            navigation.navigate("kiemHang")
+            break;
+    }
+  }
+  data = [
+    {key:"1",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.handleView},
+    {key:"2",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.handleView},
+    {key:"3",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
+    ]
   render() {
     return (
         <SafeAreaView style={style.container}>
@@ -77,7 +97,7 @@ export default class TabSanPhamCpn extends Component {
             </TouchableOpacity>
             <SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={data}
+                    data={this.data}
                     renderItem={(item) => <Item param={item}></Item>}
                     keyExtractor={item => item.key}
                 />
