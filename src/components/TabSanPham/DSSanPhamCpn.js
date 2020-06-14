@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {
-    faPlusCircle,
+    faImage,
     faListAlt,
     faCheckSquare,
     faDollyFlatbed,
@@ -38,16 +38,16 @@ import { TextInput } from 'react-native-gesture-handler';
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"35%",justifyContent:"center"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text>Tên Sản Phẩm</Text>
-                      <Text>Mã Sản Phẩm</Text>
+                      <Text>{item.tenSP}</Text>
+                      <Text>{item.maSP}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"35%",justifyContent:"center"}}>
                     
                     <View style={{flexDirection:"column"}}>
-                      <Text >Đơn Giá</Text>
-                      <Text >Số Lượng</Text>
+                      <Text >{item.donGia}</Text>
+                      <Text >{item.soLuong}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -75,27 +75,12 @@ export default class DSSanPhamCpn extends Component {
     navigation.navigate("themSanPham")
   }
   data = [
-    {key:"11",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"22",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"33",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"14",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"25",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"36",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"17",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"28",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"39",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"12",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"21",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"32",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"13",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"24",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"35",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"16",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"27",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"38",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"19",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"210",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"311",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
+    {key:"GA01",tenSP:"Gạo AAA",maSP:"AAA",donGia:"250,000",soLuong:28,icon:faImage},
+    {key:"TK01",tenSP:"Gạo Tứ Quý",maSP:"TK01",donGia:"310,000",soLuong:28,icon:faImage},
+    {key:"TL01",tenSP:"Gạo Thơm Lài",maSP:"TL01",donGia:"280,000",soLuong:28,icon:faImage},
+    {key:"GN01",tenSP:"Gạo Nhật",maSP:"GN01",donGia:"320,000",soLuong:28,icon:faImage},
+    {key:"DK01",tenSP:"Gạo Bồ Câu",maSP:"DK01",donGia:"310,000",soLuong:28,icon:faImage},
+    {key:"GT01",tenSP:"Gạo Tấm",maSP:"GT01",donGia:"250,000",soLuong:28,icon:faImage},
     ]
   render() {
     return (

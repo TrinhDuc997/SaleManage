@@ -94,7 +94,7 @@ export default class screenThemDonHangCpn extends Component {
                 onPress = {() => {this.funcChomSanPham()}}
             >
                 <Text style={{paddingBottom:15}}>
-                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006400"} />
+                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006abe"} />
                 </Text>
                 <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
             </TouchableOpacity>

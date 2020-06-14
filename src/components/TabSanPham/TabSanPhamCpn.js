@@ -91,7 +91,7 @@ export default class TabSanPhamCpn extends Component {
                 onPress = { () => {this.funcThemSanPham()}}
             >
                 <Text style={{paddingBottom:15}}>
-                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006400"} />
+                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006abe"} />
                 </Text>
                 <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Thêm Sản Phẩm</Text>
             </TouchableOpacity>

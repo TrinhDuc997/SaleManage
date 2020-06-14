@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Text, View} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native'
 import {createStackNavigator} from '@react-navigation/stack'
+import TabTongQuanCpn from '../../components/TabTongQuan/TabTongQuanCpn'
 
 /* private func-start */
 const Stack = createStackNavigator()
@@ -16,7 +17,7 @@ export default class TabTongQuan extends Component {
         <Stack.Navigator>
             <Stack.Screen
              name="Tổng Quan" 
-             component={View}
+             component={TabTongQuanCpn}
              options={{
               headerShown:false
             }}

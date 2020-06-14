@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Text, View} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack'
+import TabBaoCaoCpn from '../../components/TabBaoCao/TabBaoCaoCpn'
 
 /* private func-start */
 const Stack = createStackNavigator()
@@ -16,7 +17,7 @@ export default class TabBaoCao extends Component {
       <Stack.Navigator>
             <Stack.Screen 
               name="Báo Cáo"
-              component={View}
+              component={TabBaoCaoCpn}
               options={{
                 headerShown:false
               }}

@@ -33,16 +33,16 @@ import { TextInput } from 'react-native-gesture-handler';
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text>Mã Hóa Đơn</Text>
-                      <Text>Đơn Vị Cung Cấp</Text>
-                      <Text>Ngày Tháng</Text>
+                      <Text>{item.maHD}</Text>
+                      <Text>{item.dvCungCap}</Text>
+                      <Text>{item.ngay}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%",alignItems:"flex-end"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text >Số Tiền</Text>
-                      <Text >Trạng Thái</Text>
+                      <Text >{item.soTien}</Text>
+                      <Text >{item.trangThai}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -70,27 +70,13 @@ export default class screenDonNhapHangCpn extends Component {
     navigation.navigate("themSanPham")
   }
   data = [
-    {key:"11",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"22",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"33",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"14",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"25",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"36",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"17",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"28",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"39",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"12",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"21",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"32",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"13",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"24",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"35",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"16",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"27",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"38",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
-    {key:"19",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"210",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.funcThemSanPham},
-    {key:"311",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.funcThemSanPham},
+    {key:"MAHD001",maHD:"MAHD001",dvCungCap:"Tông Đại Lý Gạo Tiền Giang",ngay:'08/06',soTien:"15,450,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:"MAHD002",maHD:"MAHD002",dvCungCap:"Vựa Gạo Long An",ngay:'01/05',soTien:"17,240,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:"MAHD003",maHD:"MAHD003",dvCungCap:"Vựa Gạo Long An",ngay:'09/04',soTien:"22,350,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:"MAHD004",maHD:"MAHD004",dvCungCap:"Vựa Gạo Long An",ngay:'05/03',soTien:"26,125,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:"MAHD005",maHD:"MAHD005",dvCungCap:"Tông Đại Lý Gạo Tiền Giang",ngay:'07/02',soTien:"18,650,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:"MAHD006",maHD:"MAHD006",dvCungCap:"Vựa Gạo Long An",ngay:'010/01',soTien:"23,248,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    
     ]
   render() {
     return (
