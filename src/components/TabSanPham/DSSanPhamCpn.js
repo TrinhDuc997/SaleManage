@@ -5,30 +5,28 @@ import {
     ScrollView,
     StyleSheet,
     FlatList,
-    Button,
     TouchableOpacity,
     SafeAreaView,
-    VirtualizedList,
 } from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {
     faImage,
-    faListAlt,
-    faCheckSquare,
-    faDollyFlatbed,
     faAngleRight,
 } from '@fortawesome/free-solid-svg-icons'
 import { TextInput } from 'react-native-gesture-handler';
-
+import Realm from 'realm'
+import {ProductSchema,ProductDetailSchema,WarehouseSchema} from '../../Models/createDBRealm'
 /* private func-start */
     const Item = ({param}) => {
+    console.log("Item -> param", param)
+      
         const {
             item={},
         } = param
         return(
             <TouchableOpacity 
                 style={style.styleTouchableItem}
-                onPress= { () => item.handleView(item.key)}
+                onPress= { () => item.handleView(item)}
                 >
                 <View style={{width:"20%"}}>
                     <Text style={{textAlign:"center",paddingTop:15}}>
@@ -38,16 +36,16 @@ import { TextInput } from 'react-native-gesture-handler';
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"35%",justifyContent:"center"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text>{item.tenSP}</Text>
-                      <Text>{item.maSP}</Text>
+                      <Text>{item.productName}</Text>
+                      <Text>{item.productCode}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"35%",justifyContent:"center"}}>
                     
                     <View style={{flexDirection:"column"}}>
-                      <Text >{item.donGia}</Text>
-                      <Text >{item.soLuong}</Text>
+                      <Text >{item.retailPrice}</Text>
+                      <Text >{item.quantity}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -64,25 +62,53 @@ import { TextInput } from 'react-native-gesture-handler';
 export default class DSSanPhamCpn extends Component {
   constructor(props) {
     super(props);
+    this.state={
+      dataProducts:[]
+    }
   }
     
-  funcThemSanPham = () => {
+  handleView = (param) => {
     const {navigation} = this.props
     const {setParams} = navigation
+    console.log("DSSanPhamCpn -> handleView -> navigation", navigation)
     setParams({ // props send compoennt themSanPham
-        ductest:"test"
+        viewDetail:true,
+        fromListProduct:true
     })
-    navigation.navigate("themSanPham")
+    navigation.navigate("themSanPham",{
+      viewDetail:true,
+      fromListProduct:true,
+      dataProduct:param
+    })
   }
-  data = [
-    {key:"GA01",tenSP:"Gạo AAA",maSP:"AAA",donGia:"250,000",soLuong:28,icon:faImage},
-    {key:"TK01",tenSP:"Gạo Tứ Quý",maSP:"TK01",donGia:"310,000",soLuong:28,icon:faImage},
-    {key:"TL01",tenSP:"Gạo Thơm Lài",maSP:"TL01",donGia:"280,000",soLuong:28,icon:faImage},
-    {key:"GN01",tenSP:"Gạo Nhật",maSP:"GN01",donGia:"320,000",soLuong:28,icon:faImage},
-    {key:"DK01",tenSP:"Gạo Bồ Câu",maSP:"DK01",donGia:"310,000",soLuong:28,icon:faImage},
-    {key:"GT01",tenSP:"Gạo Tấm",maSP:"GT01",donGia:"250,000",soLuong:28,icon:faImage},
-    ]
+  
+    componentDidMount(){
+      Realm.open({
+        schema:[ProductSchema,ProductDetailSchema,WarehouseSchema]
+      }).then(realm => {
+        const dataPrice = realm.objects("ProductDetail")
+        const dataWH = realm.objects("warehouse")
+        const dataProducts = realm.objects('Product').map(item => {
+          const obj = dataPrice.find(i => (i.productCode === item.productCode))
+          const objWH = dataWH.find(i => (i.productCode === item.productCode))
+          return {
+            ...obj,
+            detailId:obj.id,
+            ...item,
+            whId:objWH.id,
+            quantity:objWH.quantity,
+            icon:faImage,
+            key:item.id,
+            handleView:this.handleView,
+            key:item.productCode}
+        })
+        this.setState({
+          dataProducts
+        })
+      })
+    }
   render() {
+    console.log("this.state:",this.state)
     return (
         <SafeAreaView style={style.container}>
           <TextInput
@@ -91,7 +117,7 @@ export default class DSSanPhamCpn extends Component {
               ></TextInput>
             <SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={this.data}
+                    data={this.state.dataProducts}
                     renderItem={(item) => <Item param={item}></Item>}
                     keyExtractor={item => item.key}
                 />

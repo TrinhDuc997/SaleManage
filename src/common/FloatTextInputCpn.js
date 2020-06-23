@@ -8,8 +8,9 @@ import { View, Animated, StyleSheet, TextInput } from 'react-native';
 export default class FloatTextInputCpn extends Component{
     constructor(props){
         super(props)
-        const { value } = this.props
-        this.position = new Animated.Value(value ? 1 : 0)
+        const { value,otherTextInputProps={} } = this.props
+        const {defaultValue} = otherTextInputProps
+        this.position = new Animated.Value((value || defaultValue) ? 1 : 0)
         this.state = {
             isFieldActive:false
         }
@@ -55,7 +56,7 @@ export default class FloatTextInputCpn extends Component{
                     value={this.props.value}
                     style={this.props.textInputStyles}
                     onFocus={this.handleFocus}
-                    onBlur={this.handleBlur}
+                    onBlur={this.handleBlur,this.props.onBlur}
                     onChangeText={this.props.onChangeText}
                     keyboardType={this.props.keyboardType}
                     {...this.props.otherTextInputProps}

@@ -9,6 +9,7 @@ import {
     faCheck,
     faPlus
 } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
 // import TabTongQuan from '../TabTongQuan/TabTongQuan'
 // import TabDonHang from '../TabDonHang/TabDonHang'
 // import TabSanPhamCtn from '../TabSanPham/TabSanPhamCtn'
@@ -20,6 +21,8 @@ import DSSanPhamCpn from '../../components/TabSanPham/DSSanPhamCpn'
 import screenDonNhapHangCpn from '../../components/TabSanPham/screenDonNhapHangCpn'
 import screenKiemHangCpn from '../../components/TabSanPham/screenKiemHangCpn'
 import screenThemDonHangCpn from '../../components/TabSanPham/screenThemDonHangCpn'
+import {funcConectDB} from '../../Models/createDBRealm'
+import {saveDataProduct} from '../../Models/saveData'
 /* private func-start */
     // const Tab = createBottomTabNavigator();
     const RootStack = createStackNavigator();
@@ -31,6 +34,9 @@ export default class PageContainer extends Component {
   }
   handleViewTab = (screen,navigation) => {
     navigation.navigate(screen)
+  }
+  componentDidMount(){
+    funcConectDB()
   }
   render() {
     return (
@@ -46,20 +52,47 @@ export default class PageContainer extends Component {
               <RootStack.Screen 
                 name="themSanPham"
                 component={TabThemSanPhamCpn}
-                options={{
+                options={({ navigation, route }) => {
+                  return{
                   headerTitle:"Thêm Sản Phẩm",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
                       <TouchableOpacity
                         style={styles.cssButtonCommon}
-                        onPress={() => {alert("aleart!")}}
+                        onPress={() => {
+                          const {params} = route
+                          console.log("PageContainer -> render -> params", params)
+                          const reqData = {
+                            id:params.id,
+                            productName:params.productName,
+                            productCode:params.productCode,
+                            description:params.description,
+                            unit:params.unit,
+                            weight:params.weight,
+                            productType:params.productType,
+                            brand:params.brand,
+                            createDate:moment().format("YYYYMMDD"),
+                            importDate:moment().format("YYYYMMDD"),
+                            applyDate:moment().format("YYYYMMDD"),
+                            status:params.isEnabled ? 1 : 0,
+                            retailPrice:params.retailPrice,
+                            wholeSalePrice:params.wholeSalePrice,
+                            importPrice:params.importPrice,
+                            customUnit:params.customUnit,
+                            quantity:Number(params.quantity) || 0,
+                            //data update
+                            whId:params.whId,
+                            detailId:params.detailId
+                          }
+                          saveDataProduct(reqData,navigation)
+                        }}
                       >
                          <FontAwesomeIcon icon={faCheck} size={20} color="black"/>
                       </TouchableOpacity>
                     )
                   },
-                }}
+                }}}
               />
               <RootStack.Screen 
                 name="danhSachSanPham"
