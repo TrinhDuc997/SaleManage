@@ -56,11 +56,9 @@ export default class screenThemDonHangCpn extends Component {
     
   funcChomSanPham = () => {
     const {navigation} = this.props
-    const {setParams} = navigation
-    setParams({ // props send compoennt themSanPham
-        ductest:"test"
+    navigation.navigate("danhSachSanPham",{
+        fromImportProduct:true
     })
-    navigation.navigate("danhSachSanPham")
   }
 
   handleView = (typeView) => {
@@ -98,14 +96,14 @@ export default class screenThemDonHangCpn extends Component {
                 </Text>
                 <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
             </TouchableOpacity>
-            <SafeAreaView style={style.styleSafeArea}>
+            {(true)&&<SafeAreaView style={style.styleSafeArea}>
                 <FlatList
                     data={this.data}
                     renderItem={(item) => <Item param={item}></Item>}
                     keyExtractor={item => item.key}
                 />
-            </SafeAreaView>
-            <SafeAreaView style={style.styleSafeAreaTotal}>
+            </SafeAreaView>}
+            <SafeAreaView    aView style={style.styleSafeAreaTotal}>
                 <View style={{width:"60%"}}>
                     <Text style={{alignItems:"flex-start",paddingLeft:15,marginTop:15,fontSize:15}}>
                         Tổng Số Lượng:

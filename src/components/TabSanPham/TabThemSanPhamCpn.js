@@ -40,6 +40,7 @@ export default class TabThemSanPhamCpn extends Component{
     render(){
         const { viewDetail=false,fromListProduct=false,dataProduct={}} = this.props.route.params || {}
         const { isEnabled} = this.state
+        console.log("TabThemSanPhamCpn -> render -> isEnabled", isEnabled)
         console.log("TabThemSanPhamCpn -> render -> dataProduct", this.props.route.params)
 
         return(
