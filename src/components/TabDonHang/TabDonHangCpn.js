@@ -66,13 +66,13 @@ export default class TabDonHangCpn extends Component {
     super(props);
   }
     
-  funcThemSanPham = () => {
+  funcThemDonHang = () => {
     const {navigation} = this.props
     const {setParams} = navigation
     setParams({ // props send compoennt themSanPham
         ductest:"test"
     })
-    navigation.navigate("themSanPham")
+    navigation.navigate("themDonDatHang")
   }
 
   handleView = (typeView) => {
@@ -106,7 +106,7 @@ export default class TabDonHangCpn extends Component {
         <SafeAreaView style={style.container}>
             <TouchableOpacity
                 style={style.styleTouchable}
-                onPress = { () => {this.funcThemSanPham()}}
+                onPress = { () => {this.funcThemDonHang()}}
             >
                 <Text style={{paddingBottom:15}}>
                     <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006abe"} />

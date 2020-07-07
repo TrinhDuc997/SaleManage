@@ -9,6 +9,7 @@
 import React from 'react';
 import 'react-native-gesture-handler';
 import PageContainer from './src/containers/PageContainer/PageContainer'
+console.disableYellowBox = true
 const App = () => {
   return (
     <PageContainer>

@@ -19,6 +19,7 @@ import {
 import { TextInput } from 'react-native-gesture-handler';
 import Realm from 'realm'
 import {ProductSchema,ProductDetailSchema,WarehouseSchema} from '../../Models/createDBRealm'
+import {parseRealmToObject} from '../../Models/actionModelCommon'
 /* private func-start */
     const Item = ({param}) => {
     console.log("Item -> param", param)
@@ -111,10 +112,12 @@ export default class DSSanPhamCpn extends Component {
         const dataProducts = realm.objects('Product').map(item => {
           const obj = dataPrice.find(i => (i.productCode === item.productCode))
           const objWH = dataWH.find(i => (i.productCode === item.productCode))
+
           return {
-            ...obj,
+            ...parseRealmToObject(obj),
             detailId:obj.id,
-            ...item,
+            ...parseRealmToObject(item),
+            // obj,
             whId:objWH.id,
             quantity:objWH.quantity,
             icon:faImage,
@@ -139,9 +142,9 @@ export default class DSSanPhamCpn extends Component {
         const obj = dataPrice.find(i => (i.productCode === item.productCode))
         const objWH = dataWH.find(i => (i.productCode === item.productCode))
         return {
-          ...obj,
+          ...parseRealmToObject(obj),
           detailId:obj.id,
-          ...item,
+          ...parseRealmToObject(item),
           whId:objWH.id,
           quantity:objWH.quantity,
           icon:faImage,
@@ -168,9 +171,9 @@ export default class DSSanPhamCpn extends Component {
             const obj = dataPrice.find(i => (i.productCode === item.productCode))
             const objWH = dataWH.find(i => (i.productCode === item.productCode))
             return {
-              ...obj,
+              ...parseRealmToObject(obj),
               detailId:obj.id,
-              ...item,
+              ...parseRealmToObject(item),
               whId:objWH.id,
               quantity:objWH.quantity,
               icon:faImage,
@@ -183,9 +186,9 @@ export default class DSSanPhamCpn extends Component {
             const obj = dataPrice.find(i => (i.productCode === item.productCode))
             const objWH = dataWH.find(i => (i.productCode === item.productCode))
             return {
-              ...obj,
+              ...parseRealmToObject(obj),
               detailId:obj.id,
-              ...item,
+              ...parseRealmToObject(item),
               whId:objWH.id,
               quantity:objWH.quantity,
               icon:faImage,

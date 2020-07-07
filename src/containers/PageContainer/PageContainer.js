@@ -21,6 +21,8 @@ import DSSanPhamCpn from '../../components/TabSanPham/DSSanPhamCpn'
 import screenDonNhapHangCpn from '../../components/TabSanPham/screenDonNhapHangCpn'
 import screenKiemHangCpn from '../../components/TabSanPham/screenKiemHangCpn'
 import screenThemDonHangCpn from '../../components/TabSanPham/screenThemDonHangCpn'
+import screenThemKiemHangCpn from '../../components/TabSanPham/screenThemKiemHangCpn'
+import screenThemDonDatHangCpn from '../../components/TabDonHang/screenThemDonDatHangCpn'
 import {funcConectDB} from '../../Models/createDBRealm'
 import {saveDataProduct} from '../../Models/saveData'
 /* private func-start */
@@ -33,6 +35,7 @@ export default class PageContainer extends Component {
     super(props);
   }
   handleViewTab = (screen,navigation) => {
+    console.log("PageContainer -> handleViewTab -> screen", screen)
     navigation.navigate(screen)
   }
   componentDidMount(){
@@ -133,8 +136,28 @@ export default class PageContainer extends Component {
               <RootStack.Screen 
                 name="kiemHang"
                 component={screenKiemHangCpn}
-                options={{
+                options={(({navigation,route}) => ({
                   headerTitle:"Kiểm Hàng",
+                  headerTitleAlign:"center",
+                  headerRight: () => {
+                    return(
+                      <TouchableOpacity
+                        style={styles.cssButtonCommon}
+                        onPress={() => {
+                          this.handleViewTab("themKiemHang",navigation)
+                        }}
+                      >
+                         <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                      </TouchableOpacity>
+                    )
+                  },
+                }))}
+              />
+              <RootStack.Screen
+                name="themDonHang"
+                component={screenThemDonHangCpn}
+                options={{
+                  headerTitle:"Thêm Đơn Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
@@ -149,10 +172,28 @@ export default class PageContainer extends Component {
                 }}
               />
               <RootStack.Screen
-                name="themDonHang"
-                component={screenThemDonHangCpn}
+                name="themKiemHang"
+                component={screenThemKiemHangCpn}
                 options={{
-                  headerTitle:"Thêm Đơn Hàng",
+                  headerTitle:"Thêm Phiếu Kiểm Hàng",
+                  headerTitleAlign:"center",
+                  headerRight: () => {
+                    return(
+                      <TouchableOpacity
+                        style={styles.cssButtonCommon}
+                        onPress={() => {alert("aleart!")}}
+                      >
+                         <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                      </TouchableOpacity>
+                    )
+                  },
+                }}
+              />
+              <RootStack.Screen
+                name="themDonDatHang"
+                component={screenThemDonDatHangCpn}
+                options={{
+                  headerTitle:"Thêm Đơn Đặt Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
