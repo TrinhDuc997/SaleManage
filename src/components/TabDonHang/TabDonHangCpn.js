@@ -18,7 +18,12 @@ import {
     faDollyFlatbed,
     faAngleRight,
 } from '@fortawesome/free-solid-svg-icons'
+import {exportGoodsSchema,exportGoodsDetailSchema,} from '../../Models/createDBRealm'
+import Realm from 'realm'
+import {parseRealmToObject} from '../../Models/actionModelCommon'
 
+
+import moment from 'moment'
 /* private func-start */
     const Item = ({param}) => {
         const {
@@ -32,22 +37,22 @@ import {
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text>Mã Đơn Hàng</Text>
-                      <Text>Khách Hàng</Text>
+                      <Text>{item.invoiceCode}</Text>
+                      <Text>{item.customerName}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%"}}>
                     <View style={{flexDirection:"column"}}>
                       <Text></Text>
-                      <Text>Ngày Tạo</Text>
+                      <Text>{moment(item.createDate,"YYYYMMDD").format("YYYY/MM/DD")}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%",alignItems:"flex-end"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text >Giá Trị Hóa Đơn</Text>
-                      <Text >Trạng Thái</Text>
+                      <Text >{item.totalAmount}</Text>
+                      <Text >{titleStatus[item.status].title}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -58,12 +63,18 @@ import {
             </TouchableOpacity>
         )
     }
-    
+    const titleStatus = {
+      1:{status:1,title:"Đã thanh toán"},
+      0:{status:1,title:"Chưa thanh toán"}
+    }
 /* private func-end */
 
 export default class TabDonHangCpn extends Component {
   constructor(props) {
     super(props);
+    this.state={
+      dataExportGoods:[]
+    }
   }
     
   funcThemDonHang = () => {
@@ -90,18 +101,32 @@ export default class TabDonHangCpn extends Component {
             break;
     }
   }
-  data = [
-    {key:"1",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.handleView},
-    {key:"2",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.handleView},
-    {key:"3",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"31",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"32",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"33",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"34",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"35",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-
-    ]
+  componentDidMount(){
+    Realm.open({
+        schema:[exportGoodsSchema,exportGoodsDetailSchema]
+      }).then(realm => {
+        const dataExportGoods = realm.objects("exportGoods").sorted('id',true).map(i => parseRealmToObject(i))
+        this.setState({
+          dataExportGoods:dataExportGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
+        })
+        realm.close()
+      })
+  }
+  componentWillReceiveProps(nextProp){
+    console.log(`check will props`,nextProp)
+    Realm.open({
+      schema:[exportGoodsSchema,exportGoodsDetailSchema]
+    }).then(realm => {
+      const dataExportGoods = realm.objects("exportGoods").sorted('id',true).map(i => parseRealmToObject(i))
+      this.setState({
+        dataExportGoods:dataExportGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
+      })
+      realm.close()
+    })
+  }
   render() {
+    console.log(`check render:`)
+    const {dataExportGoods=[]} = this.state
     return (
         <SafeAreaView style={style.container}>
             <TouchableOpacity
@@ -117,9 +142,9 @@ export default class TabDonHangCpn extends Component {
             <SafeAreaView style={style.styleSafeArea}>
             <Text style={{fontSize:22,backgroundColor:"#ffffff",padding:15}}>Danh Sách Hóa Đơn</Text>
                 <FlatList
-                    data={this.data}
+                    data={dataExportGoods}
                     renderItem={(item) => <Item param={item}></Item>}
-                    keyExtractor={item => item.key}
+                    keyExtractor={item => item.invoiceCode}
                 />
             </SafeAreaView>
         </SafeAreaView>
@@ -147,7 +172,7 @@ const style = StyleSheet.create({
     borderTopColor:"#A9A9A9",
     borderBottomColor:"#A9A9A9",
     borderWidth:1,
-    maxHeight:300
+    maxHeight:340
   },
   styleTouchableItem:{
     flexDirection:"row",

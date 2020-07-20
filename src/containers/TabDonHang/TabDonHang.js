@@ -12,16 +12,23 @@ export default class TabDonHang extends Component {
   constructor(props) {
     super(props);
   }
+  componentWillReceiveProps(){
+    console.log(`check render in tab:`)
+    this.setState({
+      render:true
+    })
+  }
   render() {
+    console.log(`check render in render:`)
     return (
       <Stack.Navigator>
-            <Stack.Screen 
+            {(true)&&<Stack.Screen 
             name="Đơn Hàng"
             component={TabDonHangCpn}
             options={{
               headerShown:false
             }}
-            ></Stack.Screen>
+            ></Stack.Screen>}
         </Stack.Navigator>
     );
   }

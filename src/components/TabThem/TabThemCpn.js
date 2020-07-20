@@ -68,10 +68,10 @@ export default class TabThemCpn extends Component {
     const {setParams} = navigation
     switch(typeView){
         case "1":
-            navigation.navigate("danhSachSanPham")
+            navigation.navigate("chonKhachHang")
             break;
         case "2":
-            navigation.navigate("donNhapHang")
+            navigation.navigate("chonNhaCungCap")
             break;
         case "3":
             navigation.navigate("kiemHang")

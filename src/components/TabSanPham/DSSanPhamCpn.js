@@ -20,19 +20,19 @@ import { TextInput } from 'react-native-gesture-handler';
 import Realm from 'realm'
 import {ProductSchema,ProductDetailSchema,WarehouseSchema} from '../../Models/createDBRealm'
 import {parseRealmToObject} from '../../Models/actionModelCommon'
+import _ from './../../common/ActionCommon'
 /* private func-start */
     const Item = ({param}) => {
-    console.log("Item -> param", param)
       
         const {
             item={},
             handleSelect,
-            fromImportProduct
+            checkSelectProduct
         } = param
         return(
             <TouchableOpacity 
                 style={style.styleTouchableItem}
-                onPress= { () => (fromImportProduct)?handleSelect(item):item.handleView(item)}
+                onPress= { () => (checkSelectProduct)?handleSelect(item):item.handleView(item)}
                 >
                 <View style={{width:"20%"}}>
                     <Text style={{textAlign:"center",paddingTop:15}}>
@@ -50,13 +50,13 @@ import {parseRealmToObject} from '../../Models/actionModelCommon'
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"35%",justifyContent:"center"}}>
                     
                     <View style={{flexDirection:"column"}}>
-                      <Text >{item.retailPrice}</Text>
+                      <Text >{_.formatNumberWithCommas(item.retailPrice)}</Text>
                       <Text >{item.quantity}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
                     <Text style={{textAlign:"center",paddingTop:15}}>
-                        <FontAwesomeIcon icon={(!!fromImportProduct)?(!!item.select)?faCheckSquare:faSquare:faAngleRight} size={20} color="#696969"/>
+                        <FontAwesomeIcon icon={(!!checkSelectProduct)?(!!item.select)?faCheckSquare:faSquare:faAngleRight} size={20} color="#696969"/>
                     </Text>
                 </View>
             </TouchableOpacity>
@@ -76,7 +76,6 @@ export default class DSSanPhamCpn extends Component {
   handleView = (param) => {
     const {navigation} = this.props
     const {setParams} = navigation
-    console.log("DSSanPhamCpn -> handleView -> navigation", navigation)
     setParams({ // props send compoennt themSanPham
         viewDetail:true,
         fromListProduct:true
@@ -88,8 +87,9 @@ export default class DSSanPhamCpn extends Component {
     })
   }
   handleSelect = (param) => {
-    console.log("check parram:",param)
     let {dataProducts} = this.state
+    const  { navigation } =  this.props
+    const {setParams} = navigation
     let convertData = []
     dataProducts.forEach(i => {
       if(i.productCode === param.productCode){
@@ -101,7 +101,11 @@ export default class DSSanPhamCpn extends Component {
     this.setState({
       dataProducts:convertData
     })
-
+    setParams({
+      dataProducts:convertData.filter(item => item.select === true)
+    })
+    
+    
   }
     componentDidMount(){
       Realm.open({
@@ -132,34 +136,36 @@ export default class DSSanPhamCpn extends Component {
       })
     }
     componentWillReceiveProps(nextProps){
-    console.log("DSSanPhamCpn -> componentWillReceiveProps -> nextProps", nextProps)
-    Realm.open({
+    const {fromImportProduct = false,fromCheckProduct = false,fromExportProduct=false} = this.props.route.params || {}
+    if(!fromImportProduct && !fromCheckProduct && !fromExportProduct)
+    { 
+      Realm.open({
       schema:[ProductSchema,ProductDetailSchema,WarehouseSchema]
-    }).then(realm => {
-      const dataPrice = realm.objects("ProductDetail")
-      const dataWH = realm.objects("warehouse")
-      const dataProducts = realm.objects('Product').map(item => {
-        const obj = dataPrice.find(i => (i.productCode === item.productCode))
-        const objWH = dataWH.find(i => (i.productCode === item.productCode))
-        return {
-          ...parseRealmToObject(obj),
-          detailId:obj.id,
-          ...parseRealmToObject(item),
-          whId:objWH.id,
-          quantity:objWH.quantity,
-          icon:faImage,
-          key:item.id,
-          handleView:this.handleView,
-          key:item.productCode}
+      }).then(realm => {
+        const dataPrice = realm.objects("ProductDetail")
+        const dataWH = realm.objects("warehouse")
+        const dataProducts = realm.objects('Product').map(item => {
+          const obj = dataPrice.find(i => (i.productCode === item.productCode))
+          const objWH = dataWH.find(i => (i.productCode === item.productCode))
+          return {
+            ...parseRealmToObject(obj),
+            detailId:obj.id,
+            ...parseRealmToObject(item),
+            whId:objWH.id,
+            quantity:objWH.quantity,
+            icon:faImage,
+            key:item.id,
+            handleView:this.handleView,
+            key:item.productCode}
+        })
+        this.setState({
+          dataProducts
+        })
+        realm.close()
       })
-      this.setState({
-        dataProducts
-      })
-      realm.close()
-    })
+    }
     }
     handleFilter = (param) => {
-      console.log("DSSanPhamCpn -> handleFilter -> param", param)
       Realm.open(
         { schema:[ProductSchema,ProductDetailSchema,WarehouseSchema]}
       ).then(realm => {
@@ -204,11 +210,9 @@ export default class DSSanPhamCpn extends Component {
       })
     }
   render() {
-    console.log("this.state:",this.state)
-    console.log("check this.props:",this.props)
-    const {fromImportProduct = false} = this.props.route.params || {}
+    const {fromImportProduct = false,fromCheckProduct=false,fromExportProduct=false} = this.props.route.params || {}
     return (
-        <SafeAreaView style={style.container}>
+        <ScrollView style={style.container}>
           <TextInput
               placeholder={"tìm kiếm..."}
               style={style.styleTextInput}
@@ -217,11 +221,11 @@ export default class DSSanPhamCpn extends Component {
             <SafeAreaView style={style.styleSafeArea}>
                 <FlatList
                     data={this.state.dataProducts}
-                    renderItem={(item) => <Item param={{...item,handleSelect:this.handleSelect,fromImportProduct}}></Item>}
+                    renderItem={(item) => <Item param={{...item,handleSelect:this.handleSelect,checkSelectProduct:(fromImportProduct || fromCheckProduct || fromExportProduct)}}></Item>}
                     keyExtractor={item => item.key}
                 />
             </SafeAreaView>
-        </SafeAreaView>
+        </ScrollView>
     );
   }
 }

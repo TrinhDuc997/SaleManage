@@ -8,6 +8,10 @@ import {
   LineChart,
 } from "react-native-chart-kit";
 import moment from "moment";
+import Realm from 'realm'
+import {CheckGoodsSchema,exportGoodsSchema,WarehouseSchema,ProductSchema,ProductDetailSchema} from '../../Models/createDBRealm'
+import {parseRealmToObject} from '../../Models/actionModelCommon'
+import _ from './../../common/ActionCommon'
 
 /* private func-start */
 /* private func-end */
@@ -15,42 +19,85 @@ import moment from "moment";
 export default class TabTongQuanCpn extends Component {
   constructor(props) {
     super(props);
-    this.state = {date:"2016-05-15"}
+    this.state = {
+      date:"2016-05-15",
+      moneyData:[0,0,0,0,0,0,0],
+      dataProducts:[],
+      belowNorm:0,
+      totalQty:0,
+      totalAmount:0,
+    }
+  }
+  componentDidMount(){
+    Realm.open({
+      schema:[CheckGoodsSchema,exportGoodsSchema,ProductSchema,ProductDetailSchema,WarehouseSchema]
+    }).then(realm => {
+      const dataCheckGoods = realm.objects("CheckGoods").map(i => parseRealmToObject(i))
+      const dataExportGoods = realm.objects("exportGoods").map(i => parseRealmToObject(i))
+      const totalData = [...dataCheckGoods,...dataExportGoods]
+      let moneyData = []
+      for(let i=0;i < 7;i++){
+          let tempData = []
+          totalData.forEach(item => {
+          const checkDate = _.compareDate(moment().subtract(`${6-i}`,'day').format("YYYY/MM/DD"),moment(item.createDate,"YYYYMMDD").format("YYYY/MM/DD"))
+          if(checkDate === 0){
+            tempData.push(item)
+          }
+        })
+        let money = 0
+        tempData.forEach(iTemp => {
+          money += iTemp.totalAmount
+        })
+        moneyData.push((money/1000000))
+      }
+      
+      // handle warehouse 
+      const dataPrice = realm.objects("ProductDetail").map(i => parseRealmToObject(i))
+      const dataWH = realm.objects("warehouse").map(i => parseRealmToObject(i))
+      const dataProducts = realm.objects('Product').map(item => {
+        const obj = dataPrice.find(i => (i.productCode === item.productCode))
+        const objWH = dataWH.find(i => (i.productCode === item.productCode))
+
+        return {
+          ...parseRealmToObject(obj),
+          detailId:obj.id,
+          ...parseRealmToObject(item),
+          // obj,
+          whId:objWH.id,
+          quantity:objWH.quantity,
+          key:item.id,
+          key:item.productCode}
+      })
+      let belowNorm = 0,totalQty=0, totalAmount = 0
+      dataProducts.forEach(i => {
+        if(i.quantity < 15){
+          belowNorm += 1
+        }
+        totalQty += i.quantity
+        totalAmount += (i.quantity * i.retailPrice)
+      })
+      this.setState({
+        belowNorm,
+        totalQty,
+        totalAmount,
+        dataProducts,
+        moneyData
+      })
+      realm.close()
+    })
   }
   render() {
+    const {
+      moneyData,
+      dataProducts,
+      belowNorm,
+      totalQty,
+      totalAmount,
+    } = this.state
     return (
       <ScrollView>
         <View style={{ backgroundColor: "#ffffff", height: 40, paddingTop: 3,flexDirection:"row" }}>
           <Text style={{ fontSize: 22, marginLeft: 10 }}>Doanh Thu</Text>
-          {/* <DatePicker
-            style={{
-                width: 150,
-                // height:35
-            }}
-            date={this.state.date}
-            mode="date"
-            placeholder="select date"
-            format="YYYY-MM-DD"
-            minDate="2016-05-01"
-            maxDate="2016-06-01"
-            confirmBtnText="Confirm"
-            cancelBtnText="Cancel"
-            customStyles={{
-              dateIcon: {
-                position: "absolute",
-                left: 0,
-                top: 4,
-                marginLeft: 0,
-              },
-              dateInput: {
-                marginLeft: 36,
-              },
-              // ... You can check the source to find the other keys.
-            }}
-            onDateChange={(date) => {
-              this.setState({ date: date });
-            }}
-          /> */}
         </View>
         <LineChart
           data={{
@@ -65,7 +112,7 @@ export default class TabTongQuanCpn extends Component {
             ],
             datasets: [
               {
-                data: [25, 30, 29, 34, 28, 30,29],
+                data: moneyData,
               },
             ],
           }}
@@ -120,9 +167,9 @@ export default class TabTongQuanCpn extends Component {
                 <Text style={{paddingTop:10,paddingBottom:10}}>Giá Trị Tồn Kho</Text>
             </View>
             <View style={{width:"40%",alignItems:"flex-end",paddingRight:25}}>
-                <Text style={{paddingTop:10,paddingBottom:10}}>1</Text>
-                <Text style={{paddingTop:10,paddingBottom:10}}>58</Text>
-                <Text style={{paddingTop:10,paddingBottom:10}}>14,56 Triệu</Text>
+                <Text style={{paddingTop:10,paddingBottom:10}}>{belowNorm}</Text>
+                <Text style={{paddingTop:10,paddingBottom:10}}>{totalQty}</Text>
+                <Text style={{paddingTop:10,paddingBottom:10}}>{_.formatNumberWithCommas(totalAmount)}</Text>
             </View>
         </View>
       </ScrollView>

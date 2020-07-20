@@ -19,6 +19,11 @@ import {
     faAngleRight,
 } from '@fortawesome/free-solid-svg-icons'
 import { TextInput } from 'react-native-gesture-handler';
+import Realm from 'realm'
+import {parseRealmToObject} from '../../Models/actionModelCommon'
+import moment from 'moment'
+import {ImportGoodsSchema,ImportGoodsDetailSchema,} from '../../Models/createDBRealm'
+import _ from './../../common/ActionCommon'
 
 /* private func-start */
     const Item = ({param}) => {
@@ -33,16 +38,16 @@ import { TextInput } from 'react-native-gesture-handler';
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text>{item.maHD}</Text>
-                      <Text>{item.dvCungCap}</Text>
-                      <Text>{item.ngay}</Text>
+                      <Text>{item.invoiceCode}</Text>
+                      <Text>{item.suplierName}</Text>
+                      <Text>{moment(item.createDate).format("YYYY/MM/DD")}</Text>
                     </View>
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%",alignItems:"flex-end"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text >{item.soTien}</Text>
-                      <Text >{item.trangThai}</Text>
+                      <Text >{_.formatNumberWithCommas(item.totalAmount)}</Text>
+                      <Text >Thành công</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -59,6 +64,9 @@ import { TextInput } from 'react-native-gesture-handler';
 export default class screenDonNhapHangCpn extends Component {
   constructor(props) {
     super(props);
+    this.state={
+      dataImportGoods:[]
+    }
   }
     
   funcThemSanPham = () => {
@@ -69,16 +77,30 @@ export default class screenDonNhapHangCpn extends Component {
     })
     navigation.navigate("themSanPham")
   }
-  data = [
-    {key:"MAHD001",maHD:"MAHD001",dvCungCap:"Tông Đại Lý Gạo Tiền Giang",ngay:'08/06',soTien:"15,450,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAHD002",maHD:"MAHD002",dvCungCap:"Vựa Gạo Long An",ngay:'01/05',soTien:"17,240,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAHD003",maHD:"MAHD003",dvCungCap:"Vựa Gạo Long An",ngay:'09/04',soTien:"22,350,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAHD004",maHD:"MAHD004",dvCungCap:"Vựa Gạo Long An",ngay:'05/03',soTien:"26,125,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAHD005",maHD:"MAHD005",dvCungCap:"Tông Đại Lý Gạo Tiền Giang",ngay:'07/02',soTien:"18,650,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAHD006",maHD:"MAHD006",dvCungCap:"Vựa Gạo Long An",ngay:'010/01',soTien:"23,248,000",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    
-    ]
+    componentDidMount(){
+      Realm.open({
+          schema:[ImportGoodsSchema,ImportGoodsDetailSchema]
+        }).then(realm => {
+          const dataImportGoods = realm.objects("ImportGoods").sorted('id',true).map(i => parseRealmToObject(i))
+          this.setState({
+            dataImportGoods:dataImportGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
+          })
+          realm.close()
+        })
+    }
+    componentWillReceiveProps(){
+      Realm.open({
+        schema:[ImportGoodsSchema,ImportGoodsDetailSchema]
+      }).then(realm => {
+        const dataImportGoods = realm.objects("ImportGoods").sorted('id',true).map(i => parseRealmToObject(i))
+        this.setState({
+          dataImportGoods:dataImportGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
+        })
+        realm.close()
+      })
+    }
   render() {
+    const {dataImportGoods=[]} = this.state
     return (
         <SafeAreaView style={style.container}>
           <TextInput
@@ -87,7 +109,7 @@ export default class screenDonNhapHangCpn extends Component {
               ></TextInput>
             <SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={this.data}
+                    data={dataImportGoods}
                     renderItem={(item) => <Item param={item}></Item>}
                     keyExtractor={item => item.key}
                 />

@@ -19,32 +19,29 @@ import {
     faAngleRight,
 } from '@fortawesome/free-solid-svg-icons'
 import { TextInput } from 'react-native-gesture-handler';
-import {CheckGoodsSchema,CheckGoodsDetailSchema,} from '../../Models/createDBRealm'
-import Realm from 'realm'
-import {parseRealmToObject} from '../../Models/actionModelCommon'
-import moment from 'moment'
+
 /* private func-start */
     const Item = ({param}) => {
-        console.log("Item -> param", param)
         const {
             item={},
         } = param
         return(
             <TouchableOpacity 
                 style={style.styleTouchableItem}
-                onPress= { () => item.handleView(item.key)}
+                onPress= { () => item.handleSelect(item)}
                 >
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text style={{marginTop:10}}>{item.ballotCode}</Text>
-                      <Text style={{marginTop:5}}>{moment(item.createDate,`YYYYMMDD`).format(`YYYY/MM/DD`)}</Text>
+                      {/* <Text>{item.supplierCode}</Text> */}
+                      <Text>{item.customerName}</Text>
+                      <Text style={{marginTop:5}}>{item.address}</Text>
                     </View>
                 </View>
-                <View
+                <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"45%",alignItems:"flex-end"}}>
                     <View style={{flexDirection:"column"}}>
-                      <Text style={{marginTop:10}}>{`Hoàn Thành`}</Text>
+                      <Text >{item.telephone}</Text>
                     </View>
                 </View>
                 <View style={{width:"10%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
@@ -58,54 +55,25 @@ import moment from 'moment'
     
 /* private func-end */
 
-export default class screenKiemHangCpn extends Component {
+export default class screenDSKhachHangCpn extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      dataCheckGoods:[]
-    }
   }
     
-  funcThemSanPham = () => {
+  handleSelect = (item) => {
     const {navigation} = this.props
     const {setParams} = navigation
     setParams({ // props send compoennt themSanPham
-        ductest:"test"
+        customer:item
     })
-    navigation.navigate("themSanPham")
-  }
-  componentDidMount(){
-    Realm.open({
-        schema:[CheckGoodsSchema,CheckGoodsDetailSchema]
-      }).then(realm => {
-        const dataCheckGoods = realm.objects("CheckGoods").sorted('id',true).map(i => parseRealmToObject(i))
-        this.setState({
-          dataCheckGoods:dataCheckGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
-        })
-        realm.close()
-      })
-  }
-  componentWillReceiveProps(){
-    Realm.open({
-        schema:[CheckGoodsSchema,CheckGoodsDetailSchema]
-      }).then(realm => {
-        const dataCheckGoods = realm.objects("CheckGoods").sorted('id',true).map(i => parseRealmToObject(i))
-        this.setState({
-          dataCheckGoods:dataCheckGoods.map(i => ({...i,icon:faListAlt,handleView:this.funcThemSanPham}))
-        })
-        realm.close()
-      })
+    navigation.navigate("themDonDatHang",{customer:item})
   }
   data = [
-    {key:"MAPK001",maPK:'MAPK001',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAPK002",maPK:'MAPK002',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAPK003",maPK:'MAPK003',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAPK004",maPK:'MAPK004',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAPK005",maPK:'MAPK005',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
-    {key:"MAPK006",maPK:'MAPK006',ngay:"08/06",trangThai:"Hoàn Thành",icon:faListAlt,handleView:this.funcThemSanPham},
+    {key:1,id:1 ,customerCode:'SP01',customerName:'Nguyễn A',address:'Tiền Giang',telephone:'0909995895',trangThai:"Hoàn Thành",icon:faListAlt,handleSelect:this.handleSelect},
+    {key:2,id:2 ,customerCode:'SP02',customerName:'Nguyễn B',address:'Binh Phước',telephone:'0909924825',trangThai:"Hoàn Thành",icon:faListAlt,handleSelect:this.handleSelect},
+    {key:3,id:3 ,customerCode:'SP03',customerName:'Nguyễn C',address:'Long An',telephone:'0909945872',trangThai:"Hoàn Thành",icon:faListAlt,handleSelect:this.handleSelect},
     ]
   render() {
-    const {dataCheckGoods=[]} = this.state
     return (
         <SafeAreaView style={style.container}>
           <TextInput
@@ -114,9 +82,9 @@ export default class screenKiemHangCpn extends Component {
               ></TextInput>
             <SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={dataCheckGoods}
+                    data={this.data}
                     renderItem={(item) => <Item param={item}></Item>}
-                    keyExtractor={item => item.ballotCode}
+                    keyExtractor={item => item.supplierCode}
                 />
             </SafeAreaView>
         </SafeAreaView>

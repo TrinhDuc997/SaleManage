@@ -18,30 +18,48 @@ import {
     faDollyFlatbed,
     faAngleRight,
 } from '@fortawesome/free-solid-svg-icons'
+import {ProductSchema,ProductDetailSchema,WarehouseSchema,ImportGoodsSchema,ImportGoodsDetailSchema,} from '../../Models/createDBRealm'
+
 import { TextInput } from 'react-native-gesture-handler';
 
 /* private func-start */
     const Item = ({param}) => {
         const {
-            item={},
+            data={},
+            handleChangeItem
         } = param
+        const {
+            item={}
+        } = data
         return(
             <SafeAreaView
                 style={style.styleSafeAreaItem}
-                onPress= { () => item.handleView(item.key)}
+                // onPress= { () => item.handleView(item.key)}
                 >
-                <View style={{width:"10%"}}>
+                <View style={{width:"5%"}}>
                 </View>
                 <View 
-                style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"50%",justifyContent:"center"}}>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Tên Sản Phẩm</Text>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Mã Sản Phẩm</Text>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Đơn Giá</Text>
+                style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%",justifyContent:"center"}}>
+                    <Text style={{paddingLeft:20,fontSize:18}}>{item.productName}</Text>
+                    <Text style={{paddingLeft:20,fontSize:18}}>{item.productCode}</Text>
+                </View>
+                <View
+                    style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%",paddingTop:10}}
+                >
+                    <Text style={{paddingLeft:10,fontSize:18}}>{item.importPrice}</Text>
                 </View>
                 <View style={{width:"30%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
-                    <TextInput style={style.styleTextInputItem}></TextInput>
+                    <TextInput style={style.styleTextInputItem}
+                        keyboardType="decimal-pad"
+                    onChangeText={(e) => {
+                        handleChangeItem({
+                            importQty:e,
+                            productCode:item.productCode
+                        })
+                    }}
+                    ></TextInput>
                 </View>
-                <View style={{width:"10%"}}>
+                <View style={{width:"5%"}}>
                 </View>
             </SafeAreaView>
         )
@@ -52,6 +70,8 @@ import { TextInput } from 'react-native-gesture-handler';
 export default class screenThemDonHangCpn extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+    }
   }
     
   funcChomSanPham = () => {
@@ -60,46 +80,77 @@ export default class screenThemDonHangCpn extends Component {
         fromImportProduct:true
     })
   }
+  funcChomNhaCungCap = () => {
+    const {navigation} = this.props
+    navigation.navigate("chonNhaCungCap",{
+        fromImportProduct:true
+    })
+  }
 
-  handleView = (typeView) => {
+  handleChange = (param) => {
     const {navigation} = this.props
     const {setParams} = navigation
-    switch(typeView){
-        case "1":
-            navigation.navigate("danhSachSanPham")
-            break;
-        case "2":
-            navigation.navigate("donNhapHang")
-            break;
-        case "3":
-            navigation.navigate("kiemHang")
-            break;
-    }
+    const newState = {...this.state,...param}
+    setParams({
+        ...newState
+    })
+    this.setState({
+        ...param
+    })
   }
-  data = [
-    {key:"1",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.handleView},
-    {key:"2",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.handleView},
-    {key:"3",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    {key:"11",title:"Danh Sách Sản Phẩm",icon:faListAlt,handleView:this.handleView},
-    {key:"22",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.handleView},
-    {key:"33",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
-    ]
+  handleChangeItem = (item) => {
+    let {dataProducts=[]} = this.props.route.params || {}
+    dataProducts.forEach((i,index) => {
+        if(i.productCode === item.productCode){
+            dataProducts[index] = {...i,importQty:item.importQty}
+        }
+    })
+    const {navigation} = this.props
+    const {setParams} = navigation
+    setParams({
+        dataProducts
+    })
+  }
   render() {
+      const {dataProducts=[],fromImportProduct=false,supplier={}} = this.props.route.params || {}
+      const {supplierName = ""} = supplier
+      const {chietKhau=0,phiGiaoHang=0} = this.state
+      let totalQty = 0,totalAmount = 0,total=0
+      dataProducts.forEach(item => {
+        totalQty += (parseFloat(item.importQty) || 0)
+        totalAmount += (parseFloat(item.importQty || 0) * parseFloat(item.retailPrice || 0))
+      })
+      total = (totalAmount - (totalAmount * parseFloat(chietKhau))/100 ) - phiGiaoHang
     return (
-        <SafeAreaView style={style.container}>
+        <ScrollView style={style.container}>
             <TouchableOpacity
+                style={style.styleTouchableSuplier}
+                onPress = {() => {this.funcChomNhaCungCap()}}
+            >
+                <Text style={{fontSize:20,fontWeight:"bold",paddingBottom:15}}>{supplierName||`Chọn Nhà cung cấp`}</Text>
+            </TouchableOpacity>
+            {(dataProducts.length === 0)
+            &&<TouchableOpacity
                 style={style.styleTouchable}
                 onPress = {() => {this.funcChomSanPham()}}
             >
                 <Text style={{paddingBottom:15}}>
-                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006abe"} />
+                    <FontAwesomeIcon icon={faPlusCircle} size={40} color={"#006abe"} />
                 </Text>
-                <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
+                <Text style={{fontSize:20,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
             </TouchableOpacity>
-            {(true)&&<SafeAreaView style={style.styleSafeArea}>
+            ||<TouchableOpacity
+                style={style.styleTouchable}
+                onPress = {() => {this.funcChomSanPham()}}
+                >
+                <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Lại Sản Phẩm</Text>
+                </TouchableOpacity>
+            }
+            {(dataProducts.length>0)&&<SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={this.data}
-                    renderItem={(item) => <Item param={item}></Item>}
+                    data={dataProducts}
+                    scrollEnabled={false}
+                    renderItem={(data) => <Item param={{data,handleChangeItem:this.handleChangeItem}}></Item>}
                     keyExtractor={item => item.key}
                 />
             </SafeAreaView>}
@@ -112,7 +163,7 @@ export default class screenThemDonHangCpn extends Component {
                         Tổng Tiền Hàng:
                     </Text>
                     <Text style={{alignItems:"flex-start",paddingLeft:15,marginTop:15,fontSize:15}}>
-                        Chiết Khấu:
+                        Chiết Khấu(%):
                     </Text>
                     <Text style={{alignItems:"flex-start",paddingLeft:15,marginTop:15,fontSize:15}}>
                         Chi Phí Tiền Hàng:
@@ -123,14 +174,26 @@ export default class screenThemDonHangCpn extends Component {
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"40%",alignItems:"flex-end"}}>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>10</Text>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>100</Text>
-                    <TextInput style={style.styleTextInputTotal}></TextInput>
-                    <TextInput style={style.styleTextInputTotal}></TextInput>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>100</Text>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{totalQty}</Text>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{totalAmount}</Text>
+                    <TextInput style={style.styleTextInputTotal}
+                        keyboardType="decimal-pad"
+                        onChangeText={(e) => {
+                            this.handleChange({
+                                chietKhau:e
+                            })
+                        }}></TextInput>
+                    <TextInput style={style.styleTextInputTotal}
+                        keyboardType="decimal-pad"
+                        onChangeText={(e) => {
+                            this.handleChange({
+                                phiGiaoHang:e
+                            })
+                        }}></TextInput>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{total}</Text>
                 </View>
             </SafeAreaView>
-        </SafeAreaView>
+        </ScrollView>
     );
   }
 }
@@ -145,17 +208,29 @@ const style = StyleSheet.create({
     paddingTop:10,
     paddingRight:50,
     paddingLeft:50,
-    marginTop:20,
+    marginTop:10,
     marginLeft:30,
     marginRight:30,
     borderTopLeftRadius:15,
     borderTopRightRadius:15
   },
+  styleTouchableSuplier: {
+    alignItems:"center",
+    backgroundColor:"#ffffff",
+    paddingTop:10,
+    marginTop:10,
+    paddingRight:50,
+    paddingLeft:50,
+    marginLeft:30,
+    marginRight:30,
+    borderRadius:15
+
+  },
   styleSafeArea:{
     borderTopColor:"#A9A9A9",
     borderBottomColor:"#A9A9A9",
     borderWidth:1,
-    maxHeight:250
+    // maxHeight:250
   },
   styleSafeAreaTotal:{
     flexDirection:"row",

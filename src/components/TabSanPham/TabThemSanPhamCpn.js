@@ -40,9 +40,6 @@ export default class TabThemSanPhamCpn extends Component{
     render(){
         const { viewDetail=false,fromListProduct=false,dataProduct={}} = this.props.route.params || {}
         const { isEnabled} = this.state
-        console.log("TabThemSanPhamCpn -> render -> isEnabled", isEnabled)
-        console.log("TabThemSanPhamCpn -> render -> dataProduct", this.props.route.params)
-
         return(
             <SafeAreaView>
                 <ScrollView>
@@ -128,7 +125,7 @@ export default class TabThemSanPhamCpn extends Component{
                             <View style={{width:"50%"}}>
                                 <FloatTextInputCpn
                                     title = 'Đơn Vị'
-                                    keyboardType="decimal-pad"
+                                    // keyboardType="decimal-pad"
                                     textInputStyles={style.inputStyle}
                                     onChangeText={(e) => this.handleChange({unit:e})}
                                     otherTextInputProps={{

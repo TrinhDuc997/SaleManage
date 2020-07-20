@@ -17,7 +17,13 @@ import TabSanPhamCpn from '../../components/TabSanPham/TabSanPhamCpn'
 import TabBaoCao from '../TabBaoCao/TabBaoCao'
 import TabThem from '../TabThem/TabThem'
 /* private func-start */
-    const Tab = createBottomTabNavigator();
+    const Tab = createBottomTabNavigator(
+    //   {
+    //   navigationOptions: {
+    //     lazy: true
+    //   }
+    //  }
+    );
 
     const getHeaderTitle = (route) => {
       const routeName = route.state
@@ -36,6 +42,7 @@ import TabThem from '../TabThem/TabThem'
           return "Tổng Quan"
       }
     }
+    let num = 0
 /* private func-end */
 
 const PageContainerTab = (props) => {
@@ -53,13 +60,14 @@ const PageContainerTab = (props) => {
         <Tab.Navigator>
           <Tab.Screen 
             name="TongQuan" 
-            component={TabTongQuan} 
-            options={{
+            component={(getHeaderTitle(route) === "Tổng Quan")?() => <TabTongQuan/>:TabTongQuan} 
+            options={({navigation,route}) => {
+              return {
               // tabBarLabel:'Tổng Quan',
               tabBarIcon:({color,size}) => (
                 <FontAwesomeIcon icon={faHome} size={size} color={color}/>
               )
-            }}
+            }}}
             />
           <Tab.Screen 
             name="DonHang" 
@@ -83,7 +91,7 @@ const PageContainerTab = (props) => {
             />
           <Tab.Screen 
           name="BaoCao" 
-          component={TabBaoCao} 
+          component={(getHeaderTitle(route) === "Tổng Quan")?() => <TabBaoCao/>:TabBaoCao } 
           options={{
             // tabBarLabel:'Báo Cáo',
             tabBarIcon:({color,size}) => (

@@ -10,6 +10,7 @@ import {
     faPlus
 } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
+import FlashMessage from "react-native-flash-message";
 // import TabTongQuan from '../TabTongQuan/TabTongQuan'
 // import TabDonHang from '../TabDonHang/TabDonHang'
 // import TabSanPhamCtn from '../TabSanPham/TabSanPhamCtn'
@@ -23,8 +24,14 @@ import screenKiemHangCpn from '../../components/TabSanPham/screenKiemHangCpn'
 import screenThemDonHangCpn from '../../components/TabSanPham/screenThemDonHangCpn'
 import screenThemKiemHangCpn from '../../components/TabSanPham/screenThemKiemHangCpn'
 import screenThemDonDatHangCpn from '../../components/TabDonHang/screenThemDonDatHangCpn'
+import screenDSNhaCungCapCpn from '../../components/TabSanPham/screenDSNhaCungCapCpn'
+import ThemNhaCungCapCpn from '../../components/SupplierCpn/ThemNhaCungCapCpn'
+import screenDSKhachHangCpn from '../../components/Customer/screenDSKhachHangCpn'
+import ThemKhachHangCpn from '../../components/Customer/ThemKhachHangCpn'
+import XemKhoCpn from '../../components/TabBaoCao/XemKhoCpn'
+import ChonNgay from '../../common/ChonNgay'
 import {funcConectDB} from '../../Models/createDBRealm'
-import {saveDataProduct} from '../../Models/saveData'
+import {saveDataProduct,saveInvoiceImport,saveInvoiceExport,saveInvoiceCheck} from '../../Models/saveData'
 /* private func-start */
     // const Tab = createBottomTabNavigator();
     const RootStack = createStackNavigator();
@@ -42,15 +49,16 @@ export default class PageContainer extends Component {
     funcConectDB()
   }
   render() {
+    console.log("rendertop")
     return (
       <NavigationContainer>
         <RootStack.Navigator>
           <RootStack.Screen 
                 name="trangChu"
                 component={PageContainerTab}
-                options={{
+                options={({ navigation, route }) =>({
                   headerTitleAlign:"center"
-                }}
+                })}
               />
               <RootStack.Screen 
                 name="themSanPham"
@@ -100,19 +108,32 @@ export default class PageContainer extends Component {
               <RootStack.Screen 
                 name="danhSachSanPham"
                 component={DSSanPhamCpn}
-                options={{
+                options={({ navigation, route }) => {
+                const {params={}} = route
+                const {fromImportProduct = false} = params
+                  return{
                   headerTitle:"Danh Sách Sản Phẩm",
                   headerTitleAlign:"center",
-                  // headerRight: () => {
-                  //   return(
-                  //     <TouchableOpacity
-                  //       style={styles.cssButtonCommon}
-                  //       onPress={() => {alert("aleart!")}}
-                  //     >
-                  //        <FontAwesomeIcon icon={faCheck} size={20} color="black"/>
-                  //     </TouchableOpacity>
-                  //   )
-                  // },
+                  headerRight: () => {
+                    const {fromImportProduct = false,dataProducts=[],fromCheckProduct=false,fromExportProduct=false} = route.params || {}
+                    return(
+                      (fromImportProduct || fromCheckProduct || fromExportProduct) &&<TouchableOpacity
+                        style={styles.cssButtonCommon}
+                        onPress={() => {
+                          if(fromImportProduct){
+                            navigation.navigate("themDonHang",{fromImportProduct,dataProducts})
+                          }else if (fromCheckProduct){
+                            navigation.navigate("themKiemHang",{dataProducts})
+                          }else{
+                            navigation.navigate("themDonDatHang",{dataProducts})
+                          }
+                        }}
+                      >
+                         <FontAwesomeIcon icon={faCheck} size={20} color="black"/>
+                      </TouchableOpacity> || undefined
+                    )
+                  } ,
+                }
                 }}
               />
               <RootStack.Screen 
@@ -122,6 +143,8 @@ export default class PageContainer extends Component {
                   headerTitle:"Đơn Nhập Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
+                  console.log("PageContainer -> route", route)
+                    
                     return(
                       <TouchableOpacity
                         style={styles.cssButtonCommon}
@@ -156,58 +179,223 @@ export default class PageContainer extends Component {
               <RootStack.Screen
                 name="themDonHang"
                 component={screenThemDonHangCpn}
-                options={{
+                options={({navigation,route}) =>({
                   headerTitle:"Thêm Đơn Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
                       <TouchableOpacity
                         style={styles.cssButtonCommon}
-                        onPress={() => {alert("aleart!")}}
+                        onPress={() => {
+                          const {params} = route
+                          saveInvoiceImport(params,navigation)
+                        }}
                       >
                          <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
                       </TouchableOpacity>
                     )
                   },
-                }}
+                })}
               />
               <RootStack.Screen
                 name="themKiemHang"
                 component={screenThemKiemHangCpn}
-                options={{
+                options={({navigation,route}) => ({
                   headerTitle:"Thêm Phiếu Kiểm Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
                       <TouchableOpacity
                         style={styles.cssButtonCommon}
-                        onPress={() => {alert("aleart!")}}
+                        onPress={() => {
+                          const {params} = route
+                          saveInvoiceCheck(params,navigation)
+                        }}
                       >
                          <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
                       </TouchableOpacity>
                     )
                   },
-                }}
+                })}
               />
               <RootStack.Screen
                 name="themDonDatHang"
                 component={screenThemDonDatHangCpn}
-                options={{
+                options={({navigation,route}) => ({
                   headerTitle:"Thêm Đơn Đặt Hàng",
                   headerTitleAlign:"center",
                   headerRight: () => {
                     return(
                       <TouchableOpacity
                         style={styles.cssButtonCommon}
-                        onPress={() => {alert("aleart!")}}
+                        onPress={() => {
+                          const {params} = route
+                          saveInvoiceExport(params,navigation)
+                        }}
                       >
                          <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
                       </TouchableOpacity>
                     )
                   },
-                }}
+                })}
+              />
+              <RootStack.Screen
+                name="chonNhaCungCap"
+                component={screenDSNhaCungCapCpn}
+                options={({ navigation, route }) => {
+                  const {params={}} = route
+                  const {fromImportProduct = false} = params
+                    return{
+                      headerTitle:"Danh sách nhà cung cấp",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      const {fromImportProduct = false,dataProducts=[]} = route.params || {}
+                      return(
+                        <TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            navigation.navigate("themNhaCungCap",{fromImportProduct,dataProducts})
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                        </TouchableOpacity>
+                      )
+                    } ,
+                  }
+                  }}
+              />
+              <RootStack.Screen
+                name="themNhaCungCap"
+                component={ThemNhaCungCapCpn}
+                options={({ navigation, route }) => {
+                  const {params={}} = route
+                  const {fromImportProduct = false} = params
+                    return{
+                      headerTitle:"Thêm nhà cung cấp",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      const {fromImportProduct = false,dataProducts=[]} = route.params || {}
+                      return(
+                        (fromImportProduct) &&<TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            navigation.navigate("chonNhaCungCap",{fromImportProduct,dataProducts})
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faCheck} size={20} color="black"/>
+                        </TouchableOpacity> || undefined
+                      )
+                    } ,
+                  }
+                  }}
+              />
+              <RootStack.Screen
+                name="chonKhachHang"
+                component={screenDSKhachHangCpn}
+                options={({ navigation, route }) => {
+                  const {params={}} = route
+                  const {fromImportProduct = false} = params
+                    return{
+                      headerTitle:"Danh sách Khách Hàng",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      const {fromImportProduct = false,dataProducts=[]} = route.params || {}
+                      return(
+                        <TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            navigation.navigate("themKhachHang",{fromImportProduct,dataProducts})
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                        </TouchableOpacity> || undefined
+                      )
+                    } ,
+                  }
+                  }}
+              />
+              <RootStack.Screen
+                name="themKhachHang"
+                component={ThemKhachHangCpn}
+                options={({ navigation, route }) => {
+                  const {params={}} = route
+                  const {fromImportProduct = false} = params
+                    return{
+                      headerTitle:"Thêm Khách Hàng",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      const {fromImportProduct = false,dataProducts=[]} = route.params || {}
+                      return(
+                        <TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            navigation.navigate("chonNhaCungCap",{fromImportProduct,dataProducts})
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                        </TouchableOpacity> || undefined
+                      )
+                    } ,
+                  }
+                  }}
+              />
+              <RootStack.Screen
+                name="xemKho"
+                component={XemKhoCpn}
+                options={({ navigation, route }) => {
+                  const {params={}} = route
+                  const {fromImportProduct = false} = params
+                    return{
+                      headerTitle:"Xem tồn kho",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      const {fromImportProduct = false,dataProducts=[]} = route.params || {}
+                      return(
+                        <TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            navigation.navigate("chonNhaCungCap",{fromImportProduct,dataProducts})
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faPlus} size={20} color="black"/>
+                        </TouchableOpacity> || undefined
+                      )
+                    } ,
+                  }
+                  }}
+              />
+              <RootStack.Screen
+                name="chonNgay"
+                component={ChonNgay}
+                options={({ navigation, route }) => {
+                  
+                    return{
+                      headerTitle:"Điều chỉnh thời gian",
+                      headerTitleAlign:"center",
+                    headerRight: () => {
+                      return(
+                        <TouchableOpacity
+                          style={styles.cssButtonCommon}
+                          onPress={() => {
+                            // console.log("route", route)
+                            // const {fromDate,toDate} = route
+                            // const { setParams } = navigation;
+                            // setParams({
+                            //   fromDate,
+                            //   toDate
+                            // })
+                            navigation.goBack()
+                          }}
+                        >
+                           <FontAwesomeIcon icon={faCheck} size={20} color="black"/>
+                        </TouchableOpacity>
+                      )
+                    } ,
+                  }
+                  }}
               />
         </RootStack.Navigator>
+        <FlashMessage position="top" />
       </NavigationContainer>
     );
   }

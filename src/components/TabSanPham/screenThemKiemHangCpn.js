@@ -25,46 +25,79 @@ import FloatTextInputCpn from '../../common/FloatTextInputCpn'
 import { CheckBox } from 'react-native-elements'
 
 /* private func-start */
-    const Item = ({param}) => {
-        const {
-            item={},
-        } = param
-        return(
-            <SafeAreaView
-                style={style.styleSafeAreaItem}
-                onPress= { () => item.handleView(item.key)}
-                >
-                <View style={{width:"10%"}}>
-                </View>
-                <View 
-                style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"50%",justifyContent:"center"}}>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Tên Sản Phẩm</Text>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Mã Sản Phẩm</Text>
-                    <Text style={{paddingLeft:20,fontSize:18}}>Đơn Giá</Text>
-                </View>
-                <View style={{width:"30%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
-                    <TextInput style={style.styleTextInputItem}></TextInput>
-                </View>
-                <View style={{width:"10%"}}>
-                </View>
-            </SafeAreaView>
-        )
-    }
+const Item = ({param}) => {
+    const {
+        data={},
+        handleChangeItem
+    } = param
+    const {
+        item={}
+    } = data
+    return(
+        <SafeAreaView
+            style={style.styleSafeAreaItem}
+            // onPress= { () => item.handleView(item.key)}
+            >
+            <View style={{width:"5%"}}>
+            </View>
+            <View 
+            style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%",justifyContent:"center"}}>
+                <Text style={{paddingLeft:20,fontSize:18}}>{item.productName}</Text>
+                <Text style={{paddingLeft:20,fontSize:18}}>{item.productCode}</Text>
+            </View>
+            <View
+                style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"30%",paddingTop:10}}
+            >
+                <Text style={{paddingLeft:10,fontSize:18}}>{item.quantity}</Text>
+                <Text style={{paddingLeft:10,fontSize:18}}>{(!!item.differentQty) && item.differentQty|| 0}</Text>
+            </View>
+            <View style={{width:"30%",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,}}>
+                <TextInput style={style.styleTextInputItem}
+                keyboardType="decimal-pad"
+                onChangeText={(e) => {
+                    handleChangeItem({
+                        importQty:e,
+                        productCode:item.productCode
+                    })
+                }}  
+                ></TextInput>
+            </View>
+            <View style={{width:"5%"}}>
+            </View>
+        </SafeAreaView>
+    )
+}
     
 /* private func-end */
 
 export default class screenThemKiemHangCpn extends Component {
   constructor(props) {
     super(props);
+    this.state={
+        check:1
+    }
   }
     
   funcChomSanPham = () => {
     const {navigation} = this.props
     navigation.navigate("danhSachSanPham",{
-        fromImportProduct:true
+        fromCheckProduct:true
     })
   }
-
+  handleChangeItem = (item) => {
+    let {dataProducts=[]} = this.props.route.params || {}
+    dataProducts.forEach((i,index) => {
+        if(i.productCode === item.productCode){
+            dataProducts[index] = {...i,importQty:item.importQty,differentQty:((!!item.importQty) && (item.importQty - i.quantity) || 0)}
+        }
+    })
+    const {navigation} = this.props
+    const {setParams} = navigation
+    setParams({
+        dataProducts,
+        ...this.state
+    })
+  }
   handleView = (typeView) => {
     const {navigation} = this.props
     const {setParams} = navigation
@@ -85,22 +118,50 @@ export default class screenThemKiemHangCpn extends Component {
     {key:"2",title:"Nhập Hàng",icon:faDollyFlatbed,handleView:this.handleView},
     {key:"3",title:"Kiểm Hàng",icon:faCheckSquare,handleView:this.handleView},
     ]
-  render() {
+    handleChange = (param) => {
+        const {navigation} = this.props
+        const {setParams} = navigation
+        const newState = {...this.state,...param}
+        setParams({
+            ...newState
+        })
+        this.setState({
+            ...param
+        })
+      }
+  render() {    
+      
+    const {dataProducts=[],fromImportProduct=false} = this.props.route.params || {}
+    const {check = 1} = this.state
+    let totalQty = 0,currentTotal = 0,total=0
+    dataProducts.forEach(item => {
+      totalQty += (parseFloat(item.quantity || 0))
+      currentTotal += (parseFloat(item.importQty || 0))
+      total += (item.differentQty || 0)
+    })
     return (
         <ScrollView style={style.container}>
-            <TouchableOpacity
+            {(dataProducts.length === 0)
+            &&<TouchableOpacity
                 style={style.styleTouchable}
                 onPress = {() => {this.funcChomSanPham()}}
             >
                 <Text style={{paddingBottom:15}}>
-                    <FontAwesomeIcon icon={faPlusCircle} size={50} color={"#006abe"} />
+                    <FontAwesomeIcon icon={faPlusCircle} size={40} color={"#006abe"} />
                 </Text>
-                <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
+                <Text style={{fontSize:20,fontWeight:"bold",paddingBottom:15}}>Chọn Sản Phẩm</Text>
             </TouchableOpacity>
-            {(true)&&<SafeAreaView style={style.styleSafeArea}>
+            ||<TouchableOpacity
+                style={style.styleTouchable}
+                onPress = {() => {this.funcChomSanPham()}}
+                >
+                <Text style={{fontSize:24,fontWeight:"bold",paddingBottom:15}}>Chọn Lại Sản Phẩm</Text>
+                </TouchableOpacity>
+            }
+            {(dataProducts.length>0)&&<SafeAreaView style={style.styleSafeArea}>
                 <FlatList
-                    data={this.data}
-                    renderItem={(item) => <Item param={item}></Item>}
+                    data={dataProducts}
+                    renderItem={(data) => <Item param={{data,handleChangeItem:this.handleChangeItem}}></Item>}
                     keyExtractor={item => item.key}
                 />
             </SafeAreaView>}
@@ -121,9 +182,9 @@ export default class screenThemKiemHangCpn extends Component {
                 </View>
                 <View 
                 style={{color:"#A9A9A9",borderBottomColor:"#DCDCDC",borderBottomWidth:0.9,width:"40%",alignItems:"flex-end"}}>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>10</Text>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>100</Text>
-                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>100</Text>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{currentTotal}</Text>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{totalQty}</Text>
+                    <Text style={{paddingRight:20,fontSize:15,marginTop:10}}>{total}</Text>
                     {/* <TextInput style={style.styleTextInputTotal}></TextInput> */}
                     
                 </View>
@@ -135,19 +196,25 @@ export default class screenThemKiemHangCpn extends Component {
                     checkedIcon={<FontAwesomeIcon icon={faCheckCircle} size={18} />}
                     uncheckedIcon={<FontAwesomeIcon icon={faCircle} size={18}/>}
                     title='Kiểm hàng đã bán lẽ'
-                    checked={true}
+                    checked={check === 1}
+                    onPress = { () => {
+                        this.handleChange({check:1})
+                    }}
                 />
                 <CheckBox
                         style={{paddingRight:20,fontSize:15,marginTop:10,width:"40%"}}
                         checkedIcon={<FontAwesomeIcon icon={faCheckCircle} size={18} />}
                         uncheckedIcon={<FontAwesomeIcon icon={faCircle} size={18}/>}
                         title='cập nhật tồn thực tế'
-                        checked={false}
+                        checked={check === 0}
+                        onPress = { () => {
+                            this.handleChange({check:0})
+                        }}
                 />
                 <FloatTextInputCpn
                     title = 'Ghi chú'
                     textInputStyles={style.inputStyle}
-                    onChangeText={(e) => this.handleChange({brand:e})}
+                    onChangeText={(e) => this.handleChange({note:e})}
                 ></FloatTextInputCpn>   
             </SafeAreaView>
         </ScrollView>
